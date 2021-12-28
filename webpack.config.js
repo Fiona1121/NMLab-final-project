@@ -14,7 +14,14 @@ module.exports = {
         path: path.resolve(__dirname, "./dist"),
         filename: "bundle.js",
     },
-    plugins: [new webpack.HotModuleReplacementPlugin()],
+    plugins: [
+        new webpack.HotModuleReplacementPlugin(),
+        new HtmlWebpackPlugin({
+            filename: "index.html",
+            favicon: "./public/favicon.ico",
+            template: "./public/index.html",
+        }),
+    ],
     devServer: {
         static: path.resolve(__dirname, "./dist"),
         hot: true,
