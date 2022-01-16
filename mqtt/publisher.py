@@ -36,30 +36,48 @@ class binance_Publisher:
         else:
             print("Bad connection Returned code= ", rc)
 
+    def get_avgPrice(self, res, quantity):
+        # check if field fills exist
+        if 'fills' in res.keys():
+            # check if field fills is not empty
+            if len(res['fills']) > 0:
+                # get the average price
+                total = 0
+                for fill in res['fills']:
+                    total += fill['qty'] * fill['price']
+                avgPrice = total / quantity
+                return avgPrice
+            else:
+                return 0
+
     def buy_order(self, symbol, quantity):
         try:
-            res = self.trade_client.get_ticker(symbol=symbol)
-            # get the current price
-            # price = res['price']
-            print(json.dumps(res, indent=2))
+            res = self.trade_client.order_market_buy(symbol=symbol, quantity=quantity)
+            # get average price
+            avgPrice = self.get_avgPrice(res, quantity)
+            resDict = {'symbol': symbol, 'quantity': quantity, 'avgPrice': avgPrice}
+            payload = json.dumps(resDict, indent=2)
+            print(payload)
+            self.client.publish(topic="transactions/sell", payload=payload)
+            print("Buy Order Placed")
         except BinanceAPIException as e:
             print(e.status_code)
             print(e.message)
-        self.client.publish(topic="transactions/buy", payload=f"symbol: {symbol}, quantity: {quantity}")
-        # self.client.publish(topic="transactions/buy", payload=f"symbol: {symbol}, quantity: {quantity}, avgPrice: {price}")
-        print("Order Placed")
+
 
     def sell_order(self, symbol, quantity):
         try:
-            res = self.trade_client.get_ticker(symbol=symbol)
-            # get the current price
-            # price = res['price']
-            print(json.dumps(res, indent=2))
+            res = self.trade_client.order_market_sell(symbol=symbol, quantity=quantity)
+            # get average price
+            avgPrice = self.get_avgPrice(res, quantity)
+            resDict = {'symbol': symbol, 'quantity': quantity, 'avgPrice': avgPrice}
+            payload = json.dumps(resDict, indent=2)
+            print(payload)
+            self.client.publish(topic="transactions/sell", payload=payload)
+            print("Sell Order Placed")
         except BinanceAPIException as e:
             print(e.status_code)
             print(e.message)
-        self.client.publish(topic="transactions/sell", payload=f"symbol: {symbol}, quantity: {quantity}")
-        # self.client.publish(topic="transactions/sell", payload=f"symbol: {symbol}, quantity: {quantity}, avgPrice: {price}")
 
     def close_connection(self):
         self.client.loop_stop()
@@ -68,6 +86,6 @@ class binance_Publisher:
 if __name__ == "__main__":
     pb = binance_Publisher()
     time.sleep(4)
-    pb.buy_order("BTCUSDT", "0.01")
-    pb.sell_order("BTCUSDT", "0.01")
+    pb.buy_order("BUSDUSDT", "15")
+    pb.sell_order("BUSDUSDT", "15")
     pb.close_connection()

@@ -18,4 +18,14 @@ cd mqtt
 docker run -d -it -p 1883:1883 -v $(pwd)/mosquitto.conf:/mosquitto/config/mosquitto.conf eclipse-mosquitto
 ```
 
-## 
+## run mqtt subscriber
+```bash
+cd mqtt
+python3 subscriber.py
+```
+
+## run mqtt publisher
+```bash
+cd mqtt
+python3 publisher.py
+```
