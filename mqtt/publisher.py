@@ -44,7 +44,7 @@ class binance_Publisher:
                 # get the average price
                 total = 0
                 for fill in res['fills']:
-                    total += fill['qty'] * fill['price']
+                    total += float(fill['qty']) * float(fill['price'])
                 avgPrice = total / quantity
                 return avgPrice
             else:
@@ -58,7 +58,7 @@ class binance_Publisher:
             resDict = {'symbol': symbol, 'quantity': quantity, 'avgPrice': avgPrice}
             payload = json.dumps(resDict, indent=2)
             print(payload)
-            self.client.publish(topic="transactions/sell", payload=payload)
+            self.client.publish(topic="transactions/buy", payload=payload)
             print("Buy Order Placed")
         except BinanceAPIException as e:
             print(e.status_code)
@@ -86,6 +86,6 @@ class binance_Publisher:
 if __name__ == "__main__":
     pb = binance_Publisher()
     time.sleep(4)
-    pb.buy_order("BUSDUSDT", "15")
-    pb.sell_order("BUSDUSDT", "15")
+    pb.buy_order("BUSDUSDT", 15)
+    pb.sell_order("BUSDUSDT", 15)
     pb.close_connection()
