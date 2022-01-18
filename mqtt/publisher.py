@@ -61,6 +61,7 @@ class binance_Publisher:
             resDict = {"symbol": symbol, "quantity": quantity, "avgPrice": avgPrice}
             payload = json.dumps(resDict, indent=2)
             print(payload)
+<<<<<<< HEAD
             result = self.client.publish(topic="transactions/buy", payload=payload)
             status = result[0]
             if status == 0:
@@ -68,6 +69,10 @@ class binance_Publisher:
                 print("Buy Order Placed")
             else:
                 print(f"Failed to send message to topic `transactions/buy`")
+=======
+            self.client.publish(topic="transactions/buy", payload=payload)
+            print("Buy Order Placed")
+>>>>>>> master
         except BinanceAPIException as e:
             print(e.status_code)
             print(e.message)
