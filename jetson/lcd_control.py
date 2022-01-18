@@ -77,7 +77,7 @@ class lcd :
 if __name__=="__main__":
     lcd_controller = lcd()
     # lcd_controller.setText("Fuck world\nThis is an LCD testeasfwaawf\nawfwafaw\nafgewfa\n")
-    lcd_controller.setRGB(255,255,255)
+    lcd_controller.setRGB(255,255,254)
     lcd_controller.setText("BTC:43000.12\nJohnnyChen:This comment is too damn long")
     # time.sleep(2)
     # for c in range(0,5):
