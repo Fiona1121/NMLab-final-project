@@ -5,19 +5,15 @@ import Subscriber from "./Subscriber";
 import Receiver from "./Receiver";
 import mqtt from "mqtt";
 
-export const QosOption = createContext([]);
-const qosOption = [
+export const TopicOption = createContext([]);
+const topicOption = [
     {
-        label: "0",
-        value: 0,
+        label: "transactions/buy",
+        value: "transactions/buy",
     },
     {
-        label: "1",
-        value: 1,
-    },
-    {
-        label: "2",
-        value: 2,
+        label: "transactions/sell",
+        value: "transactions/sell",
     },
 ];
 
@@ -61,8 +57,8 @@ const MqttContent = () => {
 
     const mqttPublish = (context) => {
         if (client) {
-            const { topic, qos, payload } = context;
-            client.publish(topic, payload, { qos }, (error) => {
+            const { topic, payload } = context;
+            client.publish(topic, payload, (error) => {
                 if (error) {
                     console.log("Publish error: ", error);
                 }
@@ -72,8 +68,8 @@ const MqttContent = () => {
 
     const mqttSub = (subscription) => {
         if (client) {
-            const { topic, qos } = subscription;
-            client.subscribe(topic, { qos }, (error) => {
+            const { topic } = subscription;
+            client.subscribe(topic, (error) => {
                 if (error) {
                     console.log("Subscribe to topics error", error);
                     return;
@@ -103,14 +99,14 @@ const MqttContent = () => {
                 disconnect={mqttDisconnect}
                 connectBtn={connectStatus}
             />
-            <QosOption.Provider value={qosOption}>
+            <TopicOption.Provider value={topicOption}>
                 <Subscriber
                     sub={mqttSub}
                     unSub={mqttUnSub}
                     showUnsub={isSubed}
                 />
                 <Publisher publish={mqttPublish} />
-            </QosOption.Provider>
+            </TopicOption.Provider>
             <Receiver payload={payload} />
         </>
     );

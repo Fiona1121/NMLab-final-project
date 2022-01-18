@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
 import { Card, Form, Input, Row, Col, Button, Select } from "antd";
-import { QosOption } from "./index";
+import { TopicOption } from "./index";
 
 const Publisher = ({ publish }) => {
     const [form] = Form.useForm();
-    const qosOptions = useContext(QosOption);
+    const topicOptions = useContext(TopicOption);
 
     const record = {
         topic: "testtopic/react",
@@ -25,13 +25,8 @@ const Publisher = ({ publish }) => {
         >
             <Row gutter={20}>
                 <Col span={12}>
-                    <Form.Item label="Topic" name="topic">
-                        <Input />
-                    </Form.Item>
-                </Col>
-                <Col span={12}>
-                    <Form.Item label="QoS" name="qos">
-                        <Select options={qosOptions} />
+                    <Form.Item label="Topic Options" name="Topic Options">
+                        <Select options={topicOptions} />
                     </Form.Item>
                 </Col>
                 <Col span={24}>

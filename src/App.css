@@ -12,6 +12,10 @@
     color: white;
 }
 
+.title {
+    color: white;
+}
+
 .App .ant-card {
     width: 100%;
     max-width: 850px;
@@ -20,4 +24,11 @@
 
 .ant-form-inline .ant-form-item {
     margin-bottom: 20px;
+}
+
+.video-responsive {
+    overflow: hidden;
+    padding-bottom: 56.25%;
+    position: relative;
+    height: 0;
 }
