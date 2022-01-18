@@ -38,13 +38,13 @@ class binance_Publisher:
 
     def get_avgPrice(self, res, quantity):
         # check if field fills exist
-        if 'fills' in res.keys():
+        if "fills" in res.keys():
             # check if field fills is not empty
-            if len(res['fills']) > 0:
+            if len(res["fills"]) > 0:
                 # get the average price
                 total = 0
-                for fill in res['fills']:
-                    total += float(fill['qty']) * float(fill['price'])
+                for fill in res["fills"]:
+                    total += float(fill["qty"]) * float(fill["price"])
                 avgPrice = total / quantity
                 return avgPrice
             else:
@@ -55,7 +55,7 @@ class binance_Publisher:
             res = self.trade_client.order_market_buy(symbol=symbol, quantity=quantity)
             # get average price
             avgPrice = self.get_avgPrice(res, quantity)
-            resDict = {'symbol': symbol, 'quantity': quantity, 'avgPrice': avgPrice}
+            resDict = {"symbol": symbol, "quantity": quantity, "avgPrice": avgPrice}
             payload = json.dumps(resDict, indent=2)
             print(payload)
             self.client.publish(topic="transactions/buy", payload=payload)
@@ -64,13 +64,12 @@ class binance_Publisher:
             print(e.status_code)
             print(e.message)
 
-
     def sell_order(self, symbol, quantity):
         try:
             res = self.trade_client.order_market_sell(symbol=symbol, quantity=quantity)
             # get average price
             avgPrice = self.get_avgPrice(res, quantity)
-            resDict = {'symbol': symbol, 'quantity': quantity, 'avgPrice': avgPrice}
+            resDict = {"symbol": symbol, "quantity": quantity, "avgPrice": avgPrice}
             payload = json.dumps(resDict, indent=2)
             print(payload)
             self.client.publish(topic="transactions/sell", payload=payload)
