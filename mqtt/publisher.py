@@ -53,15 +53,12 @@ class binance_Publisher:
 
     def buy_order(self, symbol, quantity):
         try:
-            # res = self.trade_client.order_market_buy(symbol=symbol, quantity=quantity)
-            res = self.trade_client.get_symbol_ticker(symbol=symbol)
+            res = self.trade_client.order_market_buy(symbol=symbol, quantity=quantity)
             print(res)
             # get average price
             avgPrice = self.get_avgPrice(res, quantity)
             resDict = {"symbol": symbol, "quantity": quantity, "avgPrice": avgPrice}
             payload = json.dumps(resDict, indent=2)
-            print(payload)
-<<<<<<< HEAD
             result = self.client.publish(topic="transactions/buy", payload=payload)
             status = result[0]
             if status == 0:
@@ -69,23 +66,18 @@ class binance_Publisher:
                 print("Buy Order Placed")
             else:
                 print(f"Failed to send message to topic `transactions/buy`")
-=======
-            self.client.publish(topic="transactions/buy", payload=payload)
-            print("Buy Order Placed")
->>>>>>> master
         except BinanceAPIException as e:
             print(e.status_code)
             print(e.message)
 
     def sell_order(self, symbol, quantity):
         try:
-            #res = self.trade_client.order_market_sell(symbol=symbol, quantity=quantity)
-            res = self.trade_client.get_symbol_ticker(symbol=symbol)
+            res = self.trade_client.order_market_sell(symbol=symbol, quantity=quantity)
+            print(res)
             # get average price
             avgPrice = self.get_avgPrice(res, quantity)
             resDict = {"symbol": symbol, "quantity": quantity, "avgPrice": avgPrice}
             payload = json.dumps(resDict, indent=2)
-            print(payload)
             result = self.client.publish(topic="transactions/sell", payload=payload)
             status = result[0]
             if status == 0:
