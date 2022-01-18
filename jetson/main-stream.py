@@ -260,3 +260,4 @@ if __name__ == "__main__":
         writer.terminate()
         comment_ctl.terminate()
         #lcd.terminate()
+        #

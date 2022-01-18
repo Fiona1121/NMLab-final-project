@@ -32,3 +32,4 @@ if __name__ == '__main__':
     com = comment_Publisher()
     print(com.comment_count)
     print(com.comments)
+    #
