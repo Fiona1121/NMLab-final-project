@@ -11,10 +11,13 @@ api_secret = os.getenv("BINANCE_SECRET")
 
 class binance_Publisher:
     def __init__(self):
-        mqttHost = "localhost"
-        mqttPort = 1883
+        mqttHost = os.getenv("MQTTHOST")
+        mqttPort = 15558
+        username = os.getenv("MQTTUSER")
+        password = os.getenv("MQTTPASS")
         try:
             self.client = mqtt.Client()
+            self.client.username_pw_set(username, password)
             self.client.connected_flag = False  # create flag in class
             self.client.on_connect = self.on_connect
             self.client.connect(mqttHost, mqttPort)
@@ -24,10 +27,8 @@ class binance_Publisher:
                 print("MQTT Client Connecting...")
 
             self.trade_client = Client(api_key, api_secret)
-
         except:
             print("connection failed")
-            # Should quit or raise flag to quit or retry
 
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:
@@ -38,13 +39,13 @@ class binance_Publisher:
 
     def get_avgPrice(self, res, quantity):
         # check if field fills exist
-        if 'fills' in res.keys():
+        if "fills" in res.keys():
             # check if field fills is not empty
-            if len(res['fills']) > 0:
+            if len(res["fills"]) > 0:
                 # get the average price
                 total = 0
-                for fill in res['fills']:
-                    total += float(fill['qty']) * float(fill['price'])
+                for fill in res["fills"]:
+                    total += float(fill["qty"]) * float(fill["price"])
                 avgPrice = total / quantity
                 return avgPrice
             else:
@@ -52,29 +53,41 @@ class binance_Publisher:
 
     def buy_order(self, symbol, quantity):
         try:
-            res = self.trade_client.order_market_buy(symbol=symbol, quantity=quantity)
+            # res = self.trade_client.order_market_buy(symbol=symbol, quantity=quantity)
+            res = self.trade_client.get_symbol_ticker(symbol=symbol)
+            print(res)
             # get average price
             avgPrice = self.get_avgPrice(res, quantity)
-            resDict = {'symbol': symbol, 'quantity': quantity, 'avgPrice': avgPrice}
+            resDict = {"symbol": symbol, "quantity": quantity, "avgPrice": avgPrice}
             payload = json.dumps(resDict, indent=2)
             print(payload)
-            self.client.publish(topic="transactions/buy", payload=payload)
-            print("Buy Order Placed")
+            result = self.client.publish(topic="transactions/buy", payload=payload)
+            status = result[0]
+            if status == 0:
+                print(f"Send `{payload}` to topic `transactions/buy`")
+                print("Buy Order Placed")
+            else:
+                print(f"Failed to send message to topic `transactions/buy`")
         except BinanceAPIException as e:
             print(e.status_code)
             print(e.message)
 
-
     def sell_order(self, symbol, quantity):
         try:
-            res = self.trade_client.order_market_sell(symbol=symbol, quantity=quantity)
+            #res = self.trade_client.order_market_sell(symbol=symbol, quantity=quantity)
+            res = self.trade_client.get_symbol_ticker(symbol=symbol)
             # get average price
             avgPrice = self.get_avgPrice(res, quantity)
-            resDict = {'symbol': symbol, 'quantity': quantity, 'avgPrice': avgPrice}
+            resDict = {"symbol": symbol, "quantity": quantity, "avgPrice": avgPrice}
             payload = json.dumps(resDict, indent=2)
             print(payload)
-            self.client.publish(topic="transactions/sell", payload=payload)
-            print("Sell Order Placed")
+            result = self.client.publish(topic="transactions/sell", payload=payload)
+            status = result[0]
+            if status == 0:
+                print(f"Send `{payload}` to topic `transactions/sell`")
+                print("Sell Order Placed")
+            else:
+                print(f"Failed to send message to topic `transactions/sell`")
         except BinanceAPIException as e:
             print(e.status_code)
             print(e.message)
