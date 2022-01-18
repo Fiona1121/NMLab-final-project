@@ -11,10 +11,18 @@ module.exports = {
                 exclude: /node_modules/,
                 use: ["babel-loader"],
             },
+            {
+                test: /\.css$/i,
+                use: ["style-loader", "css-loader"],
+            },
         ],
     },
     resolve: {
         extensions: ["*", ".js", ".jsx"],
+        fallback: {
+            stream: require.resolve("stream-browserify"),
+            buffer: require.resolve("buffer"),
+        },
     },
     output: {
         path: path.resolve(__dirname, "./dist"),
@@ -26,6 +34,10 @@ module.exports = {
             filename: "index.html",
             favicon: "./public/favicon.ico",
             template: "./public/index.html",
+        }),
+        new webpack.ProvidePlugin({
+            Buffer: ["buffer", "Buffer"],
+            process: "process/browser",
         }),
     ],
     devServer: {
