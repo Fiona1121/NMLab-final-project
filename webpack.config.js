@@ -1,6 +1,8 @@
 const webpack = require("webpack");
 const path = require("path");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+require("dotenv").config({ path: "./.env" });
 
 module.exports = {
     entry: path.resolve(__dirname, "./src/index.js"),
@@ -22,6 +24,7 @@ module.exports = {
         fallback: {
             stream: require.resolve("stream-browserify"),
             buffer: require.resolve("buffer"),
+            fs: false,
         },
     },
     output: {
@@ -33,11 +36,30 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: "index.html",
             favicon: "./public/favicon.ico",
-            template: "./public/index.html",
+            template: "/public/index.html",
         }),
         new webpack.ProvidePlugin({
             Buffer: ["buffer", "Buffer"],
             process: "process/browser",
+        }),
+        new webpack.ProvidePlugin({
+            React: "react",
+        }),
+        new webpack.DefinePlugin({
+            "process.env": JSON.stringify(process.env),
+        }),
+        new CopyWebpackPlugin({
+            patterns: [{ from: path.resolve(__dirname, "./public/static/") }],
+        }),
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: path.resolve(
+                        __dirname,
+                        "./src/data/transactions.json"
+                    ),
+                },
+            ],
         }),
     ],
     devServer: {

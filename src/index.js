@@ -1,12 +1,21 @@
-import React from "react";
-import ReactDOM from "react-dom";
+// scroll bar
+import "simplebar/src/simplebar.css";
 
-import "./index.css";
+import ReactDOM from "react-dom";
+import { BrowserRouter } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
+
+//
 import App from "./App";
+
+// ----------------------------------------------------------------------
+
 ReactDOM.render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>,
+    <HelmetProvider>
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
+    </HelmetProvider>,
     document.getElementById("root")
 );
 

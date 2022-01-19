@@ -1,18 +1,22 @@
 import React from "react";
-import MqttContent from "./components/mqttContent";
+// routes
+import Router from "./routes";
+// theme
+import ThemeConfig from "./theme";
+import GlobalStyles from "./theme/globalStyles";
+// components
+import ScrollToTop from "./components/ScrollToTop";
+import { BaseOptionChartStyle } from "./components/charts/BaseOptionChart";
 
-import "./App.css";
-import YoutubeEmbed from "./components/youtubeEmbed";
+// ----------------------------------------------------------------------
 
-const App = () => {
+export default function App() {
     return (
-        <div className="App">
-            <h1 className="title">Hamster Office</h1>
-            <YoutubeEmbed embedId="rokGy0huYEA" />
-            <h2 className="title">MQTT Dashboard</h2>
-            <MqttContent></MqttContent>
-        </div>
+        <ThemeConfig>
+            <ScrollToTop />
+            <GlobalStyles />
+            <BaseOptionChartStyle />
+            <Router />
+        </ThemeConfig>
     );
-};
-
-export default App;
+}
