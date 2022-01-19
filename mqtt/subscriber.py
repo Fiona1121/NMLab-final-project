@@ -1,31 +1,33 @@
-import argparse
-
+import os
 import paho.mqtt.client as mqtt
+
 
 def on_message(client, obj, msg):
     print(f"TOPIC:{msg.topic}, VALUE:{msg.payload}")
 
-def main(args):
-    # Establish connection to mqtt broker
-    client = mqtt.Client()
-    client.on_message = on_message
-    client.connect(host=args['ip'], port=args['port'])
-    client.subscribe('transactions/buy', 0)
-    client.subscribe('transactions/sell', 0)
 
+def on_connect(client, obj, flags, rc):
+    print(f"Connected with result code {rc}")
+    client.subscribe("transactions/buy")
+    client.subscribe("transactions/sell")
+
+
+def main():
+    # Establish connection to mqtt broker
+    mqttHost = os.getenv("MQTT_HOST", "localhost")
+    mqttPort = 15558
+    username = os.getenv("MQTTUSER")
+    password = os.getenv("MQTTPASS")
     try:
+        client = mqtt.Client()
+        client.username_pw_set(username, password)
+        client.on_connect = on_connect
+        client.on_message = on_message
+        client.connect(mqttHost, mqttPort)
         client.loop_forever()
-    except KeyboardInterrupt as e:
-        pass
+    except Exception as e:
+        print(e)
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--ip",
-                        default="localhost",
-                        help="service ip of MQTT broker")
-    parser.add_argument("--port",
-                        default=1883,
-                        type=int,
-                        help="service port of MQTT broker")
-    args = vars(parser.parse_args())
-    main(args)
+    main()
