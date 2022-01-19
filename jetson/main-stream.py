@@ -1,8 +1,11 @@
+# !/usr/bin/python
+# -*-coding:utf-8 -*-
 import cv2
 import numpy as np
 import argparse
 import requests
-import multiprocessing as mp
+import multiprocessing
+import threading
 
 import serial 
 import time
@@ -113,9 +116,9 @@ def overlay_img_filter(frame, img_path="img/roulette.png"):
     else : 
         cur_pair = pairs[2]
         print("Wheel angle weird", wheel_offset)
-    
+
     if prev_pair != cur_pair :
-        set_LCD_Text(cur_pair)
+        set_LCD_top(cur_pair)
         print(cur_pair)
 
     x_offset = 470
@@ -132,13 +135,34 @@ def overlay_img_filter(frame, img_path="img/roulette.png"):
 
     return frame
 
-def set_LCD_Text(cur_pair):
+def set_LCD_Text_2(cur_pair):
+    print(cur_pair)
     res = requests.get("https://api.binance.com/api/v3/ticker/price?symbol=" + cur_pair)
     price = str(float(res.json()["price"])).split(".")[0] + "." + str(float(res.json()["price"])).split(".")[1][:4]
     count, comments = comment_controller.get_liveChat_comment()
+    print(comments)
     if len(comments) > 0:
         lastComment = comments[-1]
         lcd_controller.setText(cur_pair[:-4] + ":" + price + "\n" + lastComment[0] + ":" + lastComment[1])
+
+def set_LCD_top(cur_pair):
+    res = requests.get("https://api.binance.com/api/v3/ticker/price?symbol=" + cur_pair)
+    price = str(float(res.json()["price"])).split(".")[0] + "." + str(float(res.json()["price"])).split(".")[1][:4]
+    lcd_controller.setText_top(cur_pair[:-4] + ":" + price + " "*3 + "\n" )
+
+def set_LCD_bottom():
+    count, comments = comment_controller.get_liveChat_comment()
+    print(comments)
+    if len(comments) > 0:
+        lastComment = comments[-1]
+        lower_text = lastComment[0] + ":" + lastComment[1]
+        framebuffer = ["", lower_text]
+        if len(lower_text) < 16 :
+            lcd_controller.setText_bottom(framebuffer[1] + " "*(16-len(lower_text)))
+        for i in range(len(lower_text) - 16 + 1):
+            framebuffer[1] = lower_text[i:i+16]
+            lcd_controller.setText_bottom(framebuffer[1])
+            time.sleep(0.2)
 
 def g2rgb(frame):
     return np.stack((frame, frame, frame), axis=-1)
@@ -178,18 +202,18 @@ def gstreamer_camera(queue):
 
 def gstreamer_rtmpstream(queue):
     global ang
-    # pipeline = (
-    #     "appsrc ! "
-    #         "video/x-raw, format=(string)BGR ! "
-    #     "queue ! "
-    #         "videoconvert ! "
-    #             "video/x-raw, format=RGBA ! "
-    #         "nvvidconv ! "
-    #         "nvv4l2h264enc bitrate=8000000 ! "
-    #         "h264parse ! "
-    #         "flvmux ! "
-    #         'rtmpsink location="rtmp://localhost/rtmp/live live=1"'
-    #     )
+    pipeline = (
+        "appsrc ! "
+            "video/x-raw, format=(string)BGR ! "
+        "queue ! "
+            "videoconvert ! "
+                "video/x-raw, format=RGBA ! "
+            "nvvidconv ! "
+            "nvv4l2h264enc bitrate=8000000 ! "
+            "h264parse ! "
+            "flvmux ! "
+            'rtmpsink location="rtmp://localhost/rtmp/live live=1"'
+        )
     pipeline = (
         "appsrc is-live=true ! "
             "video/x-raw, format=(string)BGR ! "    
@@ -229,35 +253,32 @@ def apply_filters(frame) :
     frame = overlay_img_filter(orig_frame)
     return frame
 
-def read_comment():
-    global cur_pair
+def lcd_control() :
     while True:
-        set_LCD_Text(cur_pair)
+        set_LCD_bottom()
         time.sleep(10)
 
 
 
+
 if __name__ == "__main__":
-    queue = mp.Queue(maxsize=1)
-    reader = mp.Process(target=gstreamer_camera, args=(queue,))
+    
+    queue = multiprocessing.Queue(maxsize=1)
+    reader = multiprocessing.Process(target=gstreamer_camera, args=(queue, ))
     reader.start()
-    writer = mp.Process(target=gstreamer_rtmpstream, args=(queue,))
+    writer = multiprocessing.Process(target=gstreamer_rtmpstream, args=(queue,))
     writer.start()
-    comment_ctl = mp.Process(target=read_comment)
-    comment_ctl.start()
-    #lcd = mp.Process(target=lcd_control, args=(queue,))
-    #lcd.start()
+    lcd_process = multiprocessing.Process(target=lcd_control)
+    lcd_process.start()
 
 
 
     try:
         reader.join()
         writer.join()
-        comment_ctl.join()
-        #lcd.join()
+        lcd_process.join()
     except KeyboardInterrupt as e:
         reader.terminate()
         writer.terminate()
-        comment_ctl.terminate()
-        #lcd.terminate()
+        lcd_process.terminate()
         #
