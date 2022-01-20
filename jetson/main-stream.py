@@ -125,6 +125,8 @@ def overlay_img_filter(frame, img_path="img/roulette.png"):
     y_offset = 180
     y1, y2 = y_offset, y_offset + img.shape[0]
     x1, x2 = x_offset, x_offset + img.shape[1]
+    x_center = x_offset + img.shape[1]/2
+    y_center = y_offset + img.shape[0]/2
 
     alpha_s = img[:, :, 3] / 255.0
     alpha_l = 1.0 - alpha_s
@@ -132,7 +134,7 @@ def overlay_img_filter(frame, img_path="img/roulette.png"):
     for c in range(0, 3):
         frame[y1:y2, x1:x2, c] = (alpha_s * img[:, :, c] +
                                 alpha_l * frame[y1:y2, x1:x2, c])
-
+    frame = cv2.line(frame,(x_center,y_center),(x_center,y_center-50),(0,0,255),5)
     return frame
 
 def set_LCD_Text_2(cur_pair):
@@ -148,7 +150,8 @@ def set_LCD_Text_2(cur_pair):
 def set_LCD_top(cur_pair):
     res = requests.get("https://api.binance.com/api/v3/ticker/price?symbol=" + cur_pair)
     price = str(float(res.json()["price"])).split(".")[0] + "." + str(float(res.json()["price"])).split(".")[1][:4]
-    lcd_controller.setText_top(cur_pair[:-4] + ":" + price + " "*3 + "\n" )
+    empty_len = 16 - len(cur_pair[:-4] + ":" + price)
+    lcd_controller.setText_top(cur_pair[:-4] + ":" + price + " "*empty_len + "\n" )
 
 def set_LCD_bottom():
     count, comments = comment_controller.get_liveChat_comment()
@@ -162,7 +165,7 @@ def set_LCD_bottom():
         for i in range(len(lower_text) - 16 + 1):
             framebuffer[1] = lower_text[i:i+16]
             lcd_controller.setText_bottom(framebuffer[1])
-            time.sleep(0.2)
+            time.sleep(0.05)
 
 def g2rgb(frame):
     return np.stack((frame, frame, frame), axis=-1)
