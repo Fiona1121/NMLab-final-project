@@ -30,6 +30,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, "./dist"),
         filename: "bundle.js",
+        publicPath: "/",
     },
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
@@ -64,6 +65,7 @@ module.exports = {
     ],
     devServer: {
         static: path.resolve(__dirname, "./dist"),
+        historyApiFallback: true,
         hot: true,
     },
 };
