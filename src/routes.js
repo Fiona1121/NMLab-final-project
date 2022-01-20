@@ -20,7 +20,7 @@ export default function Router() {
     const [connectStatus, setConnectStatus] = useState("Connecting");
 
     const mqttConnect = () => {
-        const url = `ws://${MQTTHOST}:${MQTTPORT}/mqtt`;
+        const url = `wss://${MQTTHOST}:${MQTTPORT}/mqtt`;
         const mqttOption = {
             username: MQTTUSER,
             password: MQTTPASS,
