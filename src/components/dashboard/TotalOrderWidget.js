@@ -42,7 +42,7 @@ export default function TotalOrderWidget({ value }) {
             </IconWrapperStyle>
             <Typography variant="h3">{fShortenNumber(value)}</Typography>
             <Typography variant="subtitle2" sx={{ opacity: 0.72 }}>
-                value Transaction Orders
+                Transaction Orders
             </Typography>
         </RootStyle>
     );

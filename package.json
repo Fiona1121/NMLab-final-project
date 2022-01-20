@@ -6,7 +6,7 @@
     "scripts": {
         "start": "webpack serve --config ./webpack.config.js --mode development --port 3000",
         "format": "npx prettier --write .",
-        "build": "webpack --progress --color --mode production --watch"
+        "build": "webpack --progress --color --mode production"
     },
     "repository": {
         "type": "git",
