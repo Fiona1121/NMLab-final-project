@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Navigate, useRoutes } from "react-router-dom";
 import mqtt from "mqtt";
+import fs from "browserify-fs";
 // layouts
 import DashboardLayout from "./layouts/dashboard";
-import LogoOnlyLayout from "./layouts/LogoOnlyLayout";
 // pages
 import DashboardApp from "./pages/DashboardApp";
 import Transaction from "./pages/Transaction";
@@ -89,11 +89,10 @@ export default function Router() {
             client.on("message", (topic, message) => {
                 const payload = {
                     topic,
-                    message: message.toString(),
+                    message: JSON.parse(message.toString()).msg,
                     date: new Date().toLocaleDateString(),
                     time: new Date().toLocaleTimeString(),
                 };
-                setTransactionData([...transactionData, payload]);
                 fs.writeFile(
                     "transaction.json",
                     JSON.stringify({
@@ -103,6 +102,7 @@ export default function Router() {
                         if (err) console.log("Error writing file:", err);
                     }
                 );
+                setTransactionData((oldData) => [...oldData, payload]);
             });
         }
     }, [client]);

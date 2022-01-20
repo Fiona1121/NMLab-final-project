@@ -20,7 +20,6 @@ import TransListHead from "../components/TransListHead";
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-    { id: "" },
     { id: "time", label: "Time", alignRight: false },
     { id: "symbol", label: "Symbol", alignRight: false },
     { id: "avgPrice", label: "Average Price", alignRight: false },
@@ -135,7 +134,6 @@ export default function Transaction({ transactionData }) {
                                                     tabIndex={-1}
                                                     role="checkbox"
                                                 >
-                                                    <TableCell align="left"></TableCell>
                                                     <TableCell align="left">
                                                         {row.time}
                                                     </TableCell>
