@@ -37,7 +37,7 @@ export default function LiveStream() {
                         textAlign: "center",
                     }}
                 >
-                    <YoutubeLiveEmbed embedId="o4HG30JmFKM"></YoutubeLiveEmbed>
+                    <YoutubeLiveEmbed embedId="mpR3MN-Dp6E"></YoutubeLiveEmbed>
                 </Box>
             </Container>
         </RootStyle>
