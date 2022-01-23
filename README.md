@@ -5,6 +5,7 @@
 # Install dependencies
 $ yarn
 $ pip install -r jetson/requirements.txt
+$ pip install -r mqtt/requirements.txt
 ```
 
 ## Get required private keys for the services
